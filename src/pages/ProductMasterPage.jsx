@@ -1,0 +1,229 @@
+import React, { useState } from 'react';
+import { Package, Plus, Edit, Search, Check } from 'lucide-react';
+import { useInventoryStore } from '../store/inventoryStore';
+import { Badge } from '../components/ui/Badge';
+import { Modal } from '../components/ui/Modal';
+
+export const ProductMasterPage = () => {
+  const { products, addProduct, updateProduct } = useInventoryStore();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  const [formData, setFormData] = useState({
+    sku: '',
+    name: '',
+    category: 'Kabel & Konektor',
+    unit: 'Pcs',
+    minStock: 15,
+    description: '',
+    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=150'
+  });
+
+  const handleOpenAdd = () => {
+    setEditingProduct(null);
+    setFormData({
+      sku: `SKU-${Date.now().toString().slice(-4)}`,
+      name: '',
+      category: 'Kabel & Konektor',
+      unit: 'Pcs',
+      minStock: 15,
+      description: '',
+      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=150'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (prod) => {
+    setEditingProduct(prod);
+    setFormData(prod);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editingProduct) {
+      updateProduct({ ...formData, id: editingProduct.id });
+    } else {
+      addProduct(formData);
+    }
+    setIsModalOpen(false);
+  };
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.sku.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Package size={24} color="var(--primary)" />
+            Master Data Produk
+          </h1>
+          <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
+            Kelola catalog SKU produk, kategori, satuan, dan ambang batas minimum stok
+          </p>
+        </div>
+
+        <button onClick={handleOpenAdd} className="btn btn-primary">
+          <Plus size={18} />
+          <span>+ Tambah Produk Baru</span>
+        </button>
+      </div>
+
+      {/* Filter toolbar */}
+      <div className="glass-panel p-4" style={{ padding: '16px', display: 'flex', gap: '12px' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <input
+            type="text"
+            className="form-control"
+            style={{ paddingLeft: '38px' }}
+            placeholder="Cari SKU atau nama produk..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="table-container glass-panel">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>SKU & Produk</th>
+              <th>Kategori</th>
+              <th>Satuan</th>
+              <th>Minimum Stok</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'center' }}>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProducts.map(prod => (
+              <tr key={prod.id}>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <img src={prod.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{prod.name}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{prod.sku}</div>
+                    </div>
+                  </div>
+                </td>
+                <td><Badge variant="neutral">{prod.category}</Badge></td>
+                <td style={{ fontSize: '0.85rem' }}>{prod.unit}</td>
+                <td style={{ fontSize: '0.85rem', fontWeight: 600 }}>{prod.minStock} {prod.unit}</td>
+                <td><Badge variant="success" showDot>Aktif</Badge></td>
+                <td style={{ textAlign: 'center' }}>
+                  <button onClick={() => handleOpenEdit(prod)} className="btn btn-secondary btn-sm">
+                    <Edit size={14} />
+                    <span>Edit</span>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal CRUD */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingProduct ? `Edit Produk: ${editingProduct.name}` : 'Tambah Produk Baru'}
+      >
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="form-group">
+            <label className="form-label">Kode SKU *</label>
+            <input
+              type="text"
+              className="form-control"
+              value={formData.sku}
+              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Nama Produk *</label>
+            <input
+              type="text"
+              className="form-control"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label className="form-label">Kategori *</label>
+              <select
+                className="form-select"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              >
+                <option value="Kabel & Konektor">Kabel & Konektor</option>
+                <option value="Aksesoris">Aksesoris</option>
+                <option value="Elektronik & Perangkat">Elektronik & Perangkat</option>
+                <option value="Networking">Networking</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Satuan Unit *</label>
+              <select
+                className="form-select"
+                value={formData.unit}
+                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              >
+                <option value="Pcs">Pcs</option>
+                <option value="Unit">Unit</option>
+                <option value="Roll">Roll</option>
+                <option value="Box">Box</option>
+                <option value="Kg">Kg</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Minimum Stok Safety Threshold *</label>
+            <input
+              type="number"
+              className="form-control"
+              value={formData.minStock}
+              onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) })}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Deskripsi Singkat</label>
+            <textarea
+              className="form-control"
+              rows={3}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px' }}>
+            <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-secondary">
+              Batal
+            </button>
+            <button type="submit" className="btn btn-primary">
+              <Check size={16} />
+              <span>{editingProduct ? 'Simpan Perubahan' : 'Tambah Produk'}</span>
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+};
