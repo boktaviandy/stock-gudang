@@ -19,9 +19,27 @@ export const useInventoryStore = create((set, get) => ({
   outbounds: INITIAL_OUTBOUNDS,
   opnames: INITIAL_OPNAMES,
   users: INITIAL_USERS,
+  categories: [
+    'Kabel & Konektor',
+    'Aksesoris',
+    'Elektronik & Perangkat',
+    'Networking',
+    'Perkakas & Tools'
+  ],
   selectedWarehouseFilter: 'ALL', // 'ALL' or 'JKT', 'DPS', etc.
 
   setSelectedWarehouseFilter: (whId) => set({ selectedWarehouseFilter: whId }),
+
+  // DYNAMIC CATEGORY MANAGEMENT
+  addCategory: (categoryName) => {
+    const { categories } = get();
+    const trimmed = categoryName.trim();
+    if (trimmed && !categories.includes(trimmed)) {
+      set({ categories: [...categories, trimmed] });
+      return { success: true, name: trimmed };
+    }
+    return { success: false, error: 'Kategori sudah ada atau nama tidak valid' };
+  },
 
   // 1. BARANG MASUK (INBOUND)
   addInbound: ({ warehouseId, date, refNo, supplier, items, createdBy, notes }) => {
