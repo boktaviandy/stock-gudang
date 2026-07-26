@@ -20,14 +20,12 @@ import { Drawer } from '../components/ui/Drawer';
 export const StockOverviewPage = () => {
   const navigate = useNavigate();
   const { isSuperAdmin, getAssignedWarehouse } = useAuthStore();
-  const { products, warehouses, stocks, selectedWarehouseFilter, setSelectedWarehouseFilter } = useInventoryStore();
+  const { products, warehouses, stocks, categories, selectedWarehouseFilter, setSelectedWarehouseFilter } = useInventoryStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [selectedProductDetail, setSelectedProductDetail] = useState(null);
-
-  const categories = ['ALL', ...new Set(products.map(p => p.category))];
 
   const assignedWh = getAssignedWarehouse();
 
@@ -117,8 +115,8 @@ export const StockOverviewPage = () => {
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            <option value="ALL">Semua Kategori</option>
-            {categories.filter(c => c !== 'ALL').map(c => (
+            <option value="ALL">Semua Kategori ({categories.length})</option>
+            {categories.map(c => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
