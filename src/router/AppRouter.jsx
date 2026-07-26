@@ -70,15 +70,10 @@ export const AppRouter = () => {
           <Route path="reports/stock-ledger" element={<StockLedgerPage />} />
           <Route path="reports/mutation" element={<MutationReportPage />} />
 
+          {/* Product Catalog & Categories (All Roles) */}
+          <Route path="master/products" element={<ProductMasterPage />} />
+
           {/* Master Data Routes (Super Admin Only) */}
-          <Route
-            path="master/products"
-            element={
-              <SuperAdminRoute>
-                <ProductMasterPage />
-              </SuperAdminRoute>
-            }
-          />
           <Route
             path="master/warehouses"
             element={
