@@ -18,7 +18,8 @@ import {
   ChevronRight,
   LogOut,
   ShieldAlert,
-  Building2
+  Building2,
+  Tag
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useInventoryStore } from '../../store/inventoryStore';
@@ -219,6 +220,27 @@ export const Sidebar = ({ isCollapsed, isMobileOpen, setIsMobileOpen }) => {
                 >
                   <Boxes size={16} />
                   {!isCollapsed && <span>Stock Overview</span>}
+                </NavLink>
+
+                <NavLink
+                  to="/app/master/products"
+                  onClick={closeMobile}
+                  style={({ isActive }) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: isCollapsed ? '10px 0' : '9px 14px 9px 24px',
+                    justifyContent: isCollapsed ? 'center' : 'flex-start',
+                    borderRadius: 'var(--radius-sm)',
+                    color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+                    backgroundColor: isActive ? 'rgba(79, 110, 247, 0.12)' : 'transparent',
+                    fontWeight: isActive ? 600 : 400,
+                    fontSize: '0.86rem',
+                    textDecoration: 'none'
+                  })}
+                >
+                  <Package size={16} />
+                  {!isCollapsed && <span>Katalog & Kategori</span>}
                 </NavLink>
 
                 <NavLink
@@ -454,7 +476,7 @@ export const Sidebar = ({ isCollapsed, isMobileOpen, setIsMobileOpen }) => {
             )}
           </div>
 
-          {/* SECTION: MASTER DATA (Super Admin Only) */}
+          {/* SECTION: MASTER DATA (Super Admin Only for Warehouses & Users) */}
           {isSuperAdmin() && (
             <div style={{ marginTop: '12px' }}>
               {!isCollapsed && (
@@ -476,34 +498,13 @@ export const Sidebar = ({ isCollapsed, isMobileOpen, setIsMobileOpen }) => {
                     cursor: 'pointer'
                   }}
                 >
-                  <span>Master Data</span>
+                  <span>Pengaturan System</span>
                   {openSections.master ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 </button>
               )}
 
               {(openSections.master || isCollapsed) && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
-                  <NavLink
-                    to="/app/master/products"
-                    onClick={closeMobile}
-                    style={({ isActive }) => ({
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: isCollapsed ? '10px 0' : '9px 14px 9px 24px',
-                      justifyContent: isCollapsed ? 'center' : 'flex-start',
-                      borderRadius: 'var(--radius-sm)',
-                      color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                      backgroundColor: isActive ? 'rgba(79, 110, 247, 0.12)' : 'transparent',
-                      fontWeight: isActive ? 600 : 400,
-                      fontSize: '0.86rem',
-                      textDecoration: 'none'
-                    })}
-                  >
-                    <Package size={16} />
-                    {!isCollapsed && <span>Master Produk</span>}
-                  </NavLink>
-
                   <NavLink
                     to="/app/master/warehouses"
                     onClick={closeMobile}
